@@ -1,0 +1,16 @@
+{
+  "name": "lihkg_json_helper",
+  "version": "1.0.0",
+  "description": "save json as file",
+  "main": "index.js",
+  "dependencies": {
+    "log4js": "^1.0.1",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nathan Lam",
+  "license": "ISC"
+}
