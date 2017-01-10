@@ -12,6 +12,8 @@ log4js.configure({
     appenders: [{
         type: 'file',
         filename: __dirname + "/log/lihkg.log"
+    }, {
+        type: 'console'
     }]
 });
 var logger = log4js.getLogger("[index.js]");
@@ -30,7 +32,7 @@ function controller(start, end) {
     var step = start;
 
     function caller(startThread_id) {
-        var ramdomNum = 19 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 13;
+        var ramdomNum = 32 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
         var childNodejs = child_process.fork(__dirname + "/lib/requestLihkg.js");
         childNodejs.send(startThread_id);
         console.log("now: " + startThread_id);
