@@ -39,18 +39,18 @@ function controller(start, end) {
         childNodejs.once('message', function (message) {
             if (message) {
                 write(startThread_id, message, function () {
+                    logger.info("Last threadNum done : " + startThread_id);
+                    if (file.statSync(logPath + "lihkg.log").size / (1024 * 1024) > 2) {
+                        file.renameSync(logPath + "lihkg.log", logPath + "lihkg_" + step + ".log");
+                    }
+                    step++;
+                    if (step <= end) {
+                        console.log("delay " + ramdomNum + "s to start " + step);
+                        setTimeout(function () {
+                            caller(step);
+                        }, ramdomNum * 1000);
+                    }
                 });
-            }
-            logger.info("Last threadNum done : " + startThread_id);
-            if (file.statSync(logPath + "lihkg.log").size / (1024 * 1024) > 2) {
-                file.renameSync(logPath + "lihkg.log", logPath + "lihkg_" + step + ".log");
-            }
-            step++;
-            if (step <= end) {
-                console.log("delay " + ramdomNum + "s to start " + step);
-                setTimeout(function () {
-                    caller(step);
-                }, ramdomNum * 1000);
             }
         });
     }
