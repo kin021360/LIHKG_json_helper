@@ -34,8 +34,10 @@ function controller(start, end) {
         childNodejs.once('message', function (message) {
             if (message) {
                 write(startThread_id, message);
+                logger.info("Last threadNum done : " + startThread_id);
+            } else {
+                logger.warn("Last threadNum done with error: " + startThread_id);
             }
-            logger.info("Last threadNum done : " + startThread_id);
             if (file.statSync(logPath + "lihkg.log").size / (1024 * 1024) > 2) {
                 file.renameSync(logPath + "lihkg.log", logPath + "lihkg_" + step + ".log");
             }
