@@ -18,8 +18,13 @@ log4js.configure({
 });
 var logger = log4js.getLogger("[index.js]");
 
-function write(threadNum, inputData) {
-    file.writeFileSync(__dirname + "/json/thread_" + threadNum + ".json", inputData);
+function write(threadNum, inputData, callback) {
+    file.writeFile(__dirname + "/json/thread_" + threadNum + ".json", inputData, function (err) {
+        if (err) {
+            console.log(err);
+        }
+        callback();
+    });
 }
 
 function controller(start, end) {
@@ -27,26 +32,37 @@ function controller(start, end) {
     var step = start;
 
     function caller(startThread_id) {
-        var ramdomNum = 28 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
-        var childNodejs = child_process.fork(__dirname + "/lib/requestLihkg.js");
-        childNodejs.send(startThread_id);
-        console.log("now: " + startThread_id);
-        childNodejs.once('message', function (message) {
-            if (message) {
-                write(startThread_id, message);
-                logger.info("Last threadNum done : " + startThread_id);
-            } else {
-                logger.warn("Last threadNum done with error: " + startThread_id);
-            }
+
+        function forkWorker(startThread_id, callback) {
+            var childNodejs = child_process.fork(__dirname + "/lib/requestLihkg.js");
+            childNodejs.send(startThread_id);
+            console.log("now: " + startThread_id);
+            childNodejs.once('message', function (message) {
+                if (message) {
+                    write(startThread_id, message, function () {
+                        logger.info("Last threadNum done : " + startThread_id);
+                        //ensure the logger finished
+                        setTimeout(callback, 200);
+                    });
+                } else {
+                    logger.warn("Last threadNum done with error: " + startThread_id);
+                    //ensure the logger finished
+                    setTimeout(callback, 200);
+                }
+            });
+        }
+
+        forkWorker(startThread_id, function () {
+            var randomNum = 28 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
             if (file.statSync(logPath + "lihkg.log").size / (1024 * 1024) > 2) {
-                file.renameSync(logPath + "lihkg.log", logPath + "lihkg_" + step + ".log");
+                file.renameSync(logPath + "lihkg.log", logPath + "lihkg_" + startThread_id + ".log");
             }
             step++;
             if (step <= end) {
-                console.log("delay " + ramdomNum + "s to start " + step);
+                console.log("delay " + randomNum + "s to start " + step);
                 setTimeout(function () {
                     caller(step);
-                }, ramdomNum * 1000);
+                }, randomNum * 1000);
             }
         });
     }
@@ -59,4 +75,4 @@ function controller(start, end) {
 // process.argv[2]
 // process.argv[3]
 
-controller(2, 2);
+controller(2, 3);
