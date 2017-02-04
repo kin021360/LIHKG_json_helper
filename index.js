@@ -8,15 +8,6 @@ var child_process = require("child_process");
 //var requestLihkg=require("./lib/requestLihkg");
 //var event = new EventEmitter();
 var log4js = require("log4js");
-log4js.configure({
-    appenders: [{
-        type: 'file',
-        filename: __dirname + "/log/lihkg.log"
-    }, {
-        type: 'console'
-    }]
-});
-var logger = log4js.getLogger("[index.js]");
 
 function write(threadNum, inputData, callback) {
     file.writeFile(__dirname + "/json/thread_" + threadNum + ".json", inputData, function (err) {
@@ -34,6 +25,15 @@ function controller(start, end) {
     function caller(startThread_id) {
 
         function forkWorker(startThread_id, callback) {
+            log4js.configure({
+                appenders: [{
+                    type: 'file',
+                    filename: __dirname + "/log/lihkg.log"
+                }, {
+                    type: 'console'
+                }]
+            });
+            var logger = log4js.getLogger("[index.js]");
             var childNodejs = child_process.fork(__dirname + "/lib/requestLihkg.js");
             childNodejs.send(startThread_id);
             console.log("now: " + startThread_id);
@@ -41,20 +41,18 @@ function controller(start, end) {
                 if (message) {
                     write(startThread_id, message, function () {
                         logger.info("Last threadNum done : " + startThread_id);
-                        //ensure the logger finished
-                        setTimeout(callback, 200);
+                        callback();
                     });
                 } else {
                     logger.warn("Last threadNum done with error: " + startThread_id);
-                    //ensure the logger finished
-                    setTimeout(callback, 200);
+                    callback();
                 }
             });
         }
 
         forkWorker(startThread_id, function () {
             var randomNum = 28 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
-            if (file.statSync(logPath + "lihkg.log").size / (1024 * 1024) > 2) {
+            if (file.statSync(logPath + "lihkg.log").size > 2097152) {
                 file.renameSync(logPath + "lihkg.log", logPath + "lihkg_" + startThread_id + ".log");
             }
             step++;

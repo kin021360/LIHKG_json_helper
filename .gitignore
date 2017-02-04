@@ -3,3 +3,4 @@ node_modules/
 json/thread_*.json
 error/error.json
 log/lihkg.log
+log/lihkg_*.log
