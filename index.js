@@ -8,6 +8,16 @@ var child_process = require("child_process");
 //var requestLihkg=require("./lib/requestLihkg");
 //var event = new EventEmitter();
 var log4js = require("log4js");
+log4js.configure({
+    appenders: [{
+        type: 'fileSync',
+        filename: __dirname + "/log/lihkg.log",
+        maxLogSize: 2097152
+    }, {
+        type: 'console'
+    }]
+});
+var logger = log4js.getLogger("[index.js]");
 
 function write(threadNum, inputData, callback) {
     file.writeFile(__dirname + "/json/thread_" + threadNum + ".json", inputData, function (err) {
@@ -18,22 +28,24 @@ function write(threadNum, inputData, callback) {
     });
 }
 
-function controller(start, end) {
+function logRename(startThread_id, callback) {
     var logPath = __dirname + "/log/";
+    file.stat(logPath + "lihkg.log.1", function (error, stats) {
+        if (error) {
+            callback();
+        } else {
+            file.renameSync(logPath + "lihkg.log.1", logPath + "lihkg_" + startThread_id + ".log");
+            callback();
+        }
+    })
+}
+
+function controller(start, end) {
     var step = start;
 
     function caller(startThread_id) {
 
         function forkWorker(startThread_id, callback) {
-            log4js.configure({
-                appenders: [{
-                    type: 'file',
-                    filename: __dirname + "/log/lihkg.log"
-                }, {
-                    type: 'console'
-                }]
-            });
-            var logger = log4js.getLogger("[index.js]");
             var childNodejs = child_process.fork(__dirname + "/lib/requestLihkg.js");
             childNodejs.send(startThread_id);
             console.log("now: " + startThread_id);
@@ -52,9 +64,8 @@ function controller(start, end) {
 
         forkWorker(startThread_id, function () {
             var randomNum = 28 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
-            if (file.statSync(logPath + "lihkg.log").size > 2097152) {
-                file.renameSync(logPath + "lihkg.log", logPath + "lihkg_" + startThread_id + ".log");
-            }
+            logRename(startThread_id, function () {
+            });
             step++;
             if (step <= end) {
                 console.log("delay " + randomNum + "s to start " + step);
