@@ -19,15 +19,6 @@ log4js.configure({
 });
 var logger = log4js.getLogger("[index.js]");
 
-function write(threadNum, inputData, callback) {
-    file.writeFile(__dirname + "/json/thread_" + threadNum + ".json", inputData, function (err) {
-        if (err) {
-            console.log(err);
-        }
-        callback();
-    });
-}
-
 function logRename(startThread_id, callback) {
     var logPath = __dirname + "/log/";
     file.stat(logPath + "lihkg.log.1", function (error, stats) {
@@ -47,19 +38,17 @@ function controller(start, end) {
 
         function forkWorker(startThread_id, callback) {
             var childNodejs = child_process.fork(__dirname + "/lib/requestLihkg.js");
-            childNodejs.send(startThread_id);
-            console.log("now: " + startThread_id);
             childNodejs.once('message', function (message) {
+                console.log("process finish!");
                 if (message) {
-                    write(startThread_id, message, function () {
-                        logger.info("Last threadNum done : " + startThread_id);
-                        callback();
-                    });
+                    logger.info("Last threadNum done : " + startThread_id);
                 } else {
                     logger.warn("Last threadNum done with error: " + startThread_id);
-                    callback();
                 }
+                callback();
             });
+            console.log("now: " + startThread_id);
+            childNodejs.send(startThread_id);
         }
 
         forkWorker(startThread_id, function () {
