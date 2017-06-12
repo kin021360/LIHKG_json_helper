@@ -3,11 +3,11 @@
  */
 "use strict";
 
-var file = require("fs");
-var child_process = require("child_process");
+const file = require("fs");
+const child_process = require("child_process");
 //var requestLihkg=require("./lib/requestLihkg");
 //var event = new EventEmitter();
-var log4js = require("log4js");
+const log4js = require("log4js");
 log4js.configure({
     appenders: [{
         type: 'fileSync',
@@ -17,10 +17,10 @@ log4js.configure({
         type: 'console'
     }]
 });
-var logger = log4js.getLogger("[index.js]");
+const logger = log4js.getLogger("[index.js]");
 
 function logRename(startThread_id, callback) {
-    var logPath = __dirname + "/log/";
+    let logPath = __dirname + "/log/";
     file.stat(logPath + "lihkg.log.1", function (error, stats) {
         if (error) {
             callback();
@@ -32,12 +32,12 @@ function logRename(startThread_id, callback) {
 }
 
 function controller(start, end) {
-    var step = start;
+    let step = start;
 
     function caller(startThread_id) {
 
         function forkWorker(startThread_id, callback) {
-            var childNodejs = child_process.fork(__dirname + "/lib/requestLihkg.js");
+            let childNodejs = child_process.fork(__dirname + "/lib/requestLihkg.js");
             childNodejs.once('message', function (message) {
                 console.log("process finish!");
                 if (message) {
@@ -52,7 +52,7 @@ function controller(start, end) {
         }
 
         forkWorker(startThread_id, function () {
-            var randomNum = 28 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
+            let randomNum = 28 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
             logRename(startThread_id, function () {
             });
             step++;
@@ -73,4 +73,4 @@ function controller(start, end) {
 // process.argv[2]
 // process.argv[3]
 
-controller(2, 3);
+controller(4, 5);
