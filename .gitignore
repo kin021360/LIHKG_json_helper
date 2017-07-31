@@ -1,6 +1,7 @@
 .idea/
 node_modules/
-json/thread_*.json
+json/*.json
 error/error.json
 log/lihkg.log
 log/lihkg_*.log
+error/*.txt
