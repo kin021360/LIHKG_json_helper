@@ -19,7 +19,7 @@ const errMsg = {
 };
 
 function writeJson(threadNum, inputData, callback) {
-    file.writeFile(__dirname + "./json/thread_" + threadNum + ".json", inputData, function (err) {
+    file.writeFile(__dirname + "/json/thread_" + threadNum + ".json", inputData, function (err) {
         if (err) {
             console.log(err);
         }
@@ -52,6 +52,7 @@ function getThreadData(threadNum) {
             if (data) {
                 resolve(data);
             } else {
+                console.log("ThreadId: " + threadNum + " has no data");
                 reject();
             }
         });
@@ -98,10 +99,10 @@ function controller(ids) {
         }
 
         worker(startIndex, function () {
-            let randomNum = 13 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
+            let randomNum = 11 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
             const step = startIndex += 2;
             if (step < errIds.length) {
-                console.log("delay " + randomNum + "s to start index" + step);
+                console.log("delay " + randomNum + "s to start index" + step + " of total " + errIds.length + " - 1");
                 setTimeout(function () {
                     caller(step);
                 }, randomNum * 1000);
@@ -115,4 +116,6 @@ function controller(ids) {
     }
 }
 
-controller([108617, 109047, 112462, 112848, 118164]);
+getErrIds(function (array) {
+    controller(array);
+});

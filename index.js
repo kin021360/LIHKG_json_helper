@@ -52,7 +52,7 @@ function controller(start, end) {
         }
 
         forkWorker(startThread_id, function () {
-            let randomNum = 28 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
+            let randomNum = 11 + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) * 6;
             logRename(startThread_id, function () {
             });
             step++;
