@@ -5,3 +5,5 @@ error/error.json
 log/lihkg.log
 log/lihkg_*.log
 error/*.txt
+error/backup*
+log/backup*
